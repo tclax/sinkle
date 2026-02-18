@@ -18,11 +18,6 @@ const SHIP_TILE = '🚢';
 // GAME STATE
 // ============================================
 
-let targetWord = '';
-let currentRow = 0;
-let currentTile = 0;
-let gameOver = false;
-let currentGuess = '';
 let battleBoard = new Map();
 let startTime = null;
 let timerInterval = null;
@@ -32,12 +27,8 @@ let timerInterval = null;
 // ============================================
 
 function initialize() {
-    targetWord = '';
-    currentRow = 0;
-    currentTile = 0;
-    gameOver = false;
-    currentGuess = '';
-    battleBoard = new Map();
+
+    battleBoard.clear();
 
     createBoard();
     placeShips(5);
@@ -51,16 +42,18 @@ function initialize() {
 
 function createBoard() {
     const board = document.getElementById('game-board');
+    board.classList.remove('disable');
+    board.innerHTML = '';
     board.replaceChildren();
     
-    for (let i = 0; i < MAX_LENGTH; i++) {
+    for (let rowIndex = 0; rowIndex < MAX_LENGTH; rowIndex++) {
         const row = document.createElement('div');
         row.className = 'row';
         
-        for (let j = 0; j < MAX_WIDTH; j++) {
+        for (let columnIndex = 0; columnIndex < MAX_WIDTH; columnIndex++) {
             const tile = document.createElement('div');
             tile.className = 'tile';
-            tile.id = `tile-${i}-${j}`;
+            tile.id = `tile-${rowIndex}-${columnIndex}`;
             tile.textContent = EMPTY_TILE;
             tile.addEventListener('click', () => {
                 handleTileClick(tile.id);
@@ -264,6 +257,8 @@ function handleTileClick(tile) {
     }
 
     if (checkGameOver()) {
+        const gameBoard = document.getElementById("game-board");
+        gameBoard.classList.add("disable");
         stopTimer();
         showShareMessage();
     }
