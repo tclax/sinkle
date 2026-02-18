@@ -279,11 +279,14 @@ function flipTile(tileFlip, newValue) {
     
 }
 
-function showMessage(text, duration = 1500) {
-    const message = document.getElementById('message');
+function showMessage(text, duration=1500) {
+    const info = document.getElementById('info');
+    const message = document.getElementById('game-details');
     message.textContent = text;
-    message.classList.add('show');
-    setTimeout(() => message.classList.remove('show'), duration);
+    info.classList.add('show');
+    setTimeout(() => { 
+        info.classList.remove('show');
+    }, duration);
 }
 
 function showShareMessage() {
@@ -332,4 +335,8 @@ document.getElementById("copy-btn").addEventListener("click", async () => {
 // INITIALIZE
 // ============================================
 
-initialize();
+showMessage(`Sink all the ships very quickly.\nYou will be graded on speed and accuracy.\nThink.\nAct.\nSinkle.\n${EMPTY_TILE}-OCEAN\n${HIT_TILE}-HIT\n${MISS_TILE}-MISS`, 3000);
+setTimeout(() => { 
+    initialize();
+},  3000);
+
