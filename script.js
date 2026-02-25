@@ -13,12 +13,19 @@ const MISS_TILE = '⭕️';
 const EMPTY_TILE = '🌊';
 const SHIP_TILE = '🚢';
 
+const CARRIER_KEY = "CARRIER";
+const BATTLESHIP_KEY = "BATTLESHIP";
+const SUBMARINE_KEY = "SUBMARINE";
+const DESTROYER_KEY = "DESTROYER";
+const SCOUT_KEY = "SCOUT";
+
 
 // ============================================
 // GAME STATE
 // ============================================
 
 let battleBoard = new Map();
+let ships = new Map();
 let startTime = null;
 let timerInterval = null;
 
@@ -29,13 +36,26 @@ let timerInterval = null;
 function initialize() {
 
     battleBoard.clear();
+    ships.clear();
 
+    // create the board
     createBoard();
-    placeShips(5);
-    placeShips(4);
-    placeShips(3);
-    placeShips(3);
-    placeShips(2);
+
+    // get coordinates place ships
+    const carrierCoordinates = placeShips(5);
+    const battleshipCoordinates = placeShips(4);
+    const subCoordinates = placeShips(3);
+    const destroyerCoordinates = placeShips(3);
+    const scoutCoordinates = placeShips(2);
+
+    console.log('carrierCoordiantes type: ' + typeof(carrierCoordinates));
+
+    // create a map of ships and their coordinates
+    ships.set(CARRIER_KEY, carrierCoordinates);
+    ships.set(BATTLESHIP_KEY, battleshipCoordinates);
+    ships.set(SUBMARINE_KEY, subCoordinates);
+    ships.set(DESTROYER_KEY, destroyerCoordinates);
+    ships.set(SCOUT_KEY, scoutCoordinates);
 
     startTimer();
 }
@@ -152,6 +172,7 @@ function placeShips(shipLength) {
     console.log('sample valid placement: ' + valid_placements[0]);
 
     const randomPlacements = valid_placements[Math.floor(Math.random() * valid_placements.length)];
+    console.log('random placemnt type: ' + typeof(randomPlacements));
 
     // update the boardwith the placements
     randomPlacements.forEach((element) => {
@@ -160,6 +181,8 @@ function placeShips(shipLength) {
     }); 
 
     console.log(battleBoard);
+
+    return randomPlacements;
 }
 
 
@@ -241,14 +264,24 @@ function checkGameOver() {
 function handleTileClick(tile) {
     console.log('battle tile clicked ' + tile);
 
-    const tempTileValue = battleBoard.get(tile);
-
-    let element = document.getElementById(tile);
-
     if(battleBoard.get(tile) === SHIP_TILE) {
         console.log('HIT');
         battleBoard.set(tile, HIT_TILE);
         flipTile(tile, HIT_TILE);
+
+        // check if destroyed
+        for (const [key, value] of ships) {
+            console.log('checking ' + key + " " + value);
+            console.log('value: ' + typeof(value));
+            console.log('included? ' + value.includes(tile));
+            console.log('every? ' + value.every(checkTile => battleBoard.get(checkTile) === HIT_TILE));
+            if (value.includes(tile) && value.every(checkTile => battleBoard.get(checkTile) === HIT_TILE)) {
+                console.log(key + " has sank!");
+                const destroyedElement = document.getElementById("destroyed");
+                destroyedElement.innerText += (" " + key);
+                break;
+            }
+        }
     }
     else if(battleBoard.get(tile) === EMPTY_TILE) {
         console.log('MISS');
